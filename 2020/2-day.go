@@ -10,11 +10,19 @@ import (
 	"strings"
 )
 
+/* 	Instruction part 1 : Each line gives the password policy and then the password.
+The password policy indicates the lowest and highest number of times a given letter must appear for the password to be valid.
+For example, 1-3 a means that the password must contain a at least 1 time and at most 3 times.
+
+	Insutrction part 2 : Each policy actually describes two positions in the password, where 1 means the first character, 2 means the second character, and so on.
+(Be careful; Toboggan Corporate Policies have no concept of "index zero"!) Exactly one of these positions must contain the given letter. */
+
 /* Main :
 - create 2D slice
 - launch parseSlice, which parse puzzle file into 2D slice : [X][password, policyCar, policyMin, policyMax]
 - launch solve1, which access to 2D slice, count occurence of 'policyCar' in 'password',
 and check if it is between 'policyMin' and 'policyMax'.
+- launch solve2, which access to 2D slice and check if only one of posX and posY are equals to the policy.
 */
 func main() {
 	file, err := os.Open("/home/lab0-dev/Projets/AdventOfCode/2020/2-puzzle")
@@ -25,7 +33,9 @@ func main() {
 
 	slicePuzzle := make([][]string, 0)
 	slicePuzzle = parseFile(file, slicePuzzle)
-	validPasswd := solve2(slicePuzzle)
+	validPasswd := solve1v2(slicePuzzle)
+	fmt.Println(validPasswd)
+	validPasswd = solve2v1(slicePuzzle)
 	fmt.Println(validPasswd)
 }
 
@@ -35,7 +45,10 @@ func main() {
 	Output :
 	- sliceOut
 	Info :
-	- sliceOut => [X][password, policyCar, policyMin, policyMax]
+	sliceOut struct does not change between instructions of part 1 or 2.
+	Only key change to be more accurate :
+	- sliceOut (part 1) => [X][password, policyCar, policyMin, policyMax]
+	- sliceOut (part 2) => [X][password, policyCar, posX, posY]
 */
 func parseFile(file io.Reader, sliceOut [][]string) [][]string {
 	scanner := bufio.NewScanner(file)
@@ -106,14 +119,39 @@ func solve1v2(slicePuzzle [][]string) int {
 		}
 
 		// convert 3th and 4th elem of slice into integer to be compared with occurence
-		min, err := strconv.Atoi(slice[2])
-		if err != nil {
-			log.Fatal(err)
-		}
-		max, err := strconv.Atoi(slice[3])
+		min, _ := strconv.Atoi(slice[2])
+		max, _ := strconv.Atoi(slice[3])
 
 		if occurence >= min && occurence <= max {
 			validPasswd++
+		}
+	}
+
+	return validPasswd
+}
+
+/*	Input :
+	- slicePuzzle == sliceOut
+	Output :
+	- validPassw => number of valid password according to the Instruction part 2
+*/
+func solve2v1(slicePuzzle [][]string) int {
+	validPasswd := 0
+
+	for _, slice := range slicePuzzle {
+		// convert 3th and 4th elem of slice into integer to get char in string
+		posX, _ := strconv.Atoi(slice[2])
+		posY, _ := strconv.Atoi(slice[3])
+
+		// check if only one of the both position contains the policy
+		// NOTE : because of the blank at the begenning of the string, the position of the first car is 1.
+		// Perfect according to the warning from the instruction part 2 :)
+		if string(slice[0][posX]) == string(slice[1]) && string(slice[0][posY]) != string(slice[1]) {
+			validPasswd++
+		} else if string(slice[0][posX]) != string(slice[1]) && string(slice[0][posY]) == string(slice[1]) {
+			validPasswd++
+		} else {
+			continue
 		}
 	}
 
