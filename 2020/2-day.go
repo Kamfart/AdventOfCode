@@ -25,7 +25,7 @@ func main() {
 
 	slicePuzzle := make([][]string, 0)
 	slicePuzzle = parseFile(file, slicePuzzle)
-	validPasswd := solve1(slicePuzzle)
+	validPasswd := solve2(slicePuzzle)
 	fmt.Println(validPasswd)
 }
 
@@ -90,5 +90,32 @@ func solve1(slicePuzzle [][]string) int {
 		}
 
 	}
+	return validPasswd
+}
+
+// Same as solve1, with most beautiful code as 'for each' replace 3D access.
+func solve2(slicePuzzle [][]string) int {
+	validPasswd := 0
+
+	for _, slice := range slicePuzzle {
+		occurence := 0
+		for i := 1; i < len(slice[0]); i++ {
+			if string(slice[0][i]) == string(slice[1]) {
+				occurence++
+			}
+		}
+
+		// convert 3th and 4th elem of slice into integer to be compared with occurence
+		min, err := strconv.Atoi(slice[2])
+		if err != nil {
+			log.Fatal(err)
+		}
+		max, err := strconv.Atoi(slice[3])
+
+		if occurence >= min && occurence <= max {
+			validPasswd++
+		}
+	}
+
 	return validPasswd
 }
