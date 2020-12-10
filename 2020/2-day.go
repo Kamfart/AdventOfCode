@@ -66,7 +66,7 @@ func parseFile(file io.Reader, sliceOut [][]string) [][]string {
 	Output :
 	- validPassw => number of valid password according to the Instruction part 1
 */
-func solve1(slicePuzzle [][]string) int {
+func solve1v1(slicePuzzle [][]string) int {
 	validPasswd := 0
 	for i := 0; i < len(slicePuzzle); i++ {
 		occurence := 0
@@ -94,7 +94,7 @@ func solve1(slicePuzzle [][]string) int {
 }
 
 // Same as solve1, with most beautiful code as 'for each' replace 3D access.
-func solve2(slicePuzzle [][]string) int {
+func solve1v2(slicePuzzle [][]string) int {
 	validPasswd := 0
 
 	for _, slice := range slicePuzzle {
