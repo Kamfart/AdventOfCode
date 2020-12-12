@@ -8,9 +8,14 @@ tic=timeit.default_timer()
 
 f=sys.argv[1]
 
+# Remove \n from string
 def chomp(s):
     return s[:-1] if s.endswith('\n') else s
 
+# Algo :
+# 1) convert all elem from list into int
+# 2) loop over the list twice in the same time to compare 2 value
+# 3) create buff_index value to skip if the same value is tested
 def solve1(listValue, valueWanted):
     listValue = [int(elm) for elm in listValue]
     indexI = 0
@@ -18,14 +23,15 @@ def solve1(listValue, valueWanted):
         indexJ = 0
         for j in listValue:
             if indexI == indexJ:
-                indexJ+=1
+                continue
             elif (i + j) == valueWanted:
                 return i * j
                 
             else:
                 indexJ+=1
         indexI+=1
-
+# Algo :
+# Same than solve1 with 3 loops
 def solve2(listValue, valueWanted):
     listValue = [int(elm) for elm in listValue]
     indexI = 0
@@ -35,7 +41,7 @@ def solve2(listValue, valueWanted):
             IndexK = 0
             for k in listValue:
                 if indexI == indexJ == IndexK:
-                    indexJ+=1
+                    continue
                 elif (i + j + k) == valueWanted:
                     return i * j * k
                 else:
@@ -45,6 +51,7 @@ def solve2(listValue, valueWanted):
 
 
 lClean = []
+# Add file into the list and clean /n of each slot
 with open(f,'r') as it:
     lines = it.readlines()
     for l in lines:
