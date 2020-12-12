@@ -25,9 +25,19 @@ fn main() {
         .expect("Something went wrong reading the file");
 
     // set slope
-    let move_h = 3;
-    let move_v = 1;
+    // let move_h = 1;
+    // let move_v = 2;
+    let mut _number_tree = 0;
+    
+    _number_tree = solve(&contents, 1, 1);
+    _number_tree *= solve(&contents, 3, 1);
+    _number_tree *= solve(&contents, 5, 1);
+    _number_tree *= solve(&contents, 7, 1);
+    _number_tree *= solve(&contents, 1, 2);
+    println!("number tree : {}",_number_tree);
+}
 
+fn solve(contents: &String, move_h: usize, move_v: usize) -> u64 {
     // set point
     let mut origin = 0;
 
@@ -35,10 +45,13 @@ fn main() {
     let mut skipped = 0;
    
     let mut number_tree = 0;
-    let mut end_line = 0;
+    let mut _end_line = 0;
     
     /* Algo : 
         - skipped the first origin test
+        - skipped the current iteration if move_v is superior to 0 (to simulate down)
+            - skipped is decrementad at the end of each iteration,
+            In fact, if skipped == 1, the instruction "if skipped > 0" will never be true.
         - moving into the line by adding move_h for each iteration
         - checked of current origin : 
             - if origin < len line 
@@ -48,24 +61,32 @@ fn main() {
                 - normal check
     */ 
     for line in contents.lines() {
-        end_line = line.len();
-        if origin != 0 && origin < end_line {
-            if line.chars().nth(origin).unwrap() == '#' {
-                number_tree+=1;
+        if skipped > 0 {
+            skipped -= 1;
+            continue;
+        } else {
+            skipped = move_v;
+            _end_line = line.len();
+            if origin != 0 && origin < _end_line {
+                if line.chars().nth(origin).unwrap() == '#' {
+                    number_tree+=1;
+                }
             }
+            else if origin >= _end_line {
+                let mut str_buff = "".to_owned();
+                while origin >= _end_line {
+                    str_buff += line;
+                    _end_line = str_buff.len();
+                }
+                if str_buff.chars().nth(origin).unwrap() == '#' {
+                    number_tree+=1;
+                }
+            } 
+            origin += move_h;
+            skipped -= 1;
         }
-        else if origin >= end_line {
-            let mut str_buff = "".to_owned();
-            while origin >= end_line {
-                str_buff += line;
-                end_line = str_buff.len();
-            }
-            if str_buff.chars().nth(origin).unwrap() == '#' {
-                number_tree+=1;
-            }
-        } 
-        origin += move_h;
     };
-    println!("number tree : {}",number_tree)
+
+    return number_tree;
 }
 
