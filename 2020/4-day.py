@@ -2,6 +2,23 @@ import sys, timeit
 
 tic=timeit.default_timer()
 
+# INSTRUCTION PART 1 : The automatic passport scanners are slow because they're having trouble detecting which passports have all required fields.
+# Count the number of valid passports - those that have all required fields. Treat cid as optional. In your batch file, how many passports are valid?
+# Required field :  byr (Birth Year) ; iyr (Issue Year) ; eyr (Expiration Year) ; hgt (Height) ; hcl (Hair Color) ; ecl (Eye Color) ; pid (Passport ID) ; cid (Country ID)
+
+# INSTRUCTION PART 2 : You can continue to ignore the cid field, but each other field has strict rules about what values are valid for automatic validation.
+# Your job is to count the passports where all required fields are both present and valid
+# Rules :  
+    # byr (Birth Year) - four digits; at least 1920 and at most 2002.
+    # iyr (Issue Year) - four digits; at least 2010 and at most 2020.
+    # eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
+    # hgt (Height) - a number followed by either cm or in:
+    #   If cm, the number must be at least 150 and at most 193.
+    #   If in, the number must be at least 59 and at most 76.
+    # hcl (Hair Color) - a '#' followed by exactly six characters 0-9 or a-f.
+    # ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
+    # pid (Passport ID) - a nine-digit number, including leading zeroes.
+
 # Remove \n from string
 def chomp(s):
     return s[:-1] if s.endswith('\n') else s
