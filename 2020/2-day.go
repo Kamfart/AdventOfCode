@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 /* 	Instruction part 1 : Each line gives the password policy and then the password.
@@ -25,6 +26,8 @@ and check if it is between 'policyMin' and 'policyMax'.
 - launch solve2, which access to 2D slice and check if only one of posX and posY are equals to the policy.
 */
 func main() {
+	start := time.Now()
+
 	file, err := os.Open("/home/lab0-dev/Projets/AdventOfCode/2020/2-puzzle")
 	if err != nil {
 		log.Fatal(err)
@@ -37,6 +40,10 @@ func main() {
 	fmt.Println(validPasswd)
 	validPasswd = solve2v1(slicePuzzle)
 	fmt.Println(validPasswd)
+
+	t := time.Now()
+	elapsed := t.Sub(start)
+	fmt.Println(elapsed)
 }
 
 /*	Input :
