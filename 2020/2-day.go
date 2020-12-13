@@ -28,7 +28,7 @@ and check if it is between 'policyMin' and 'policyMax'.
 func main() {
 	start := time.Now()
 
-	file, err := os.Open("/home/lab0-dev/Projets/AdventOfCode/2020/2-puzzle")
+	file, err := os.Open(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
