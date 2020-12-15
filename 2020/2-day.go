@@ -104,6 +104,9 @@ func solve1v1(slicePuzzle [][]string) int {
 			log.Fatal(err)
 		}
 		max, err := strconv.Atoi(slicePuzzle[i][3])
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		if occurence >= min && occurence <= max {
 			validPasswd++
