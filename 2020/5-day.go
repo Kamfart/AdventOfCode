@@ -13,6 +13,13 @@ import (
 func main() {
 	start := time.Now()
 
+	// part 1 - store high ID seat
+	highSeatID := 0
+
+	var numberSeatUsed = createNullSlice(128)
+	var numberColumnUsed = createNullSlice(8)
+
+	// Open and Read entire file
 	file, err := os.Open(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
@@ -20,12 +27,6 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-
-	// part 1 - store high ID seat
-	highSeatID := 0
-
-	var numberSeatUsed = createNullSlice(128)
-	var numberColumnUsed = createNullSlice(8)
 
 	for scanner.Scan() {
 
@@ -37,40 +38,22 @@ func main() {
 		rowInfo := line[0:7]
 		columnInfo := line[7:10]
 
-		var sizeSeatBuff []int
-		var columnSeatBuff []int
-		for _, car := range rowInfo {
-			s := string(car)
-			if s == "B" {
-				sizeSeatBuff = sliceArray(sizeSeat[:], "B")
-				sizeSeat = sizeSeatBuff
-			} else if s == "F" {
-				sizeSeatBuff = sliceArray(sizeSeat[:], "F")
-				sizeSeat = sizeSeatBuff
-			}
+		// select row and increment appropriate var
+		rowSelected := binarySpacePartitioning(rowInfo, sizeSeat)
+		numberSeatUsed[rowSelected]++
 
-		}
+		// select column and increment appropriate var
+		// NOTE : ALMOST WORKING, need to plug column into row table
+		columnSelected := binarySpacePartitioning(columnInfo, columnSeat)
+		numberColumnUsed[columnSelected]++
 
-		for _, car := range columnInfo {
-			s := string(car)
-			if s == "L" {
-				columnSeatBuff = sliceArray(columnSeat[:], "L")
-				columnSeat = columnSeatBuff
-			} else if s == "R" {
-				columnSeatBuff = sliceArray(columnSeat[:], "R")
-				columnSeat = columnSeatBuff
-			}
+		// Get Seat ID from formula wrote in the instruction
+		currentSeatID := rowSelected*8 + columnSelected
 
-		}
-
-		currentSeatID := sizeSeatBuff[0]*8 + columnSeatBuff[0]
-		if currentSeatID > highSeatID {
-			highSeatID = currentSeatID
-		}
-
-		numberSeatUsed[sizeSeatBuff[0]]++
-		numberColumnUsed[columnSeatBuff[0]]++
+		// Part 1 - Get High Seat ID
+		highSeatID = maxValue(currentSeatID, highSeatID)
 	}
+
 	println(highSeatID)
 	println(numberSeatUsed)
 
@@ -103,6 +86,13 @@ func main() {
 	fmt.Println(elapsed)
 }
 
+func maxValue(valA int, valB int) int {
+	if valA > valB {
+		return valA
+	}
+	return valB
+}
+
 // Split array and return the "back" or "front" part
 func sliceArray(array []int, part string) []int {
 	if part == "B" || part == "R" {
@@ -114,21 +104,24 @@ func sliceArray(array []int, part string) []int {
 	}
 }
 
-func fillSizeSeat(rowInfo, sizeSeat []int) int {
+// Iteratre over a string representation of "binany space partitioning"
+// and return the last element
+func binarySpacePartitioning(str string, sizeSeat []int) int {
 	var sizeSeatBuff []int
-	for _, car := range rowInfo {
+	for _, car := range str {
 		s := string(car)
-		if s == "B" {
-			sizeSeatBuff = sliceArray(sizeSeat[:], "B")
+		if s == "B" || s == "R" {
+			sizeSeatBuff = sliceArray(sizeSeat[:], s)
 			sizeSeat = sizeSeatBuff
-		} else if s == "F" {
-			sizeSeatBuff = sliceArray(sizeSeat[:], "F")
+		} else if s == "F" || s == "L" {
+			sizeSeatBuff = sliceArray(sizeSeat[:], s)
 			sizeSeat = sizeSeatBuff
 		}
 	}
-	return 0
+	return sizeSeatBuff[0]
 }
 
+// create a slice composed by n elem init to loop iteration
 func createSlice(size int) []int {
 	var slice = make([]int, size)
 	for i := range slice {
@@ -138,6 +131,7 @@ func createSlice(size int) []int {
 	return slice
 }
 
+// create a slice composed by n elem init to 0
 func createNullSlice(size int) []int {
 	var slice = make([]int, size)
 	for i := range slice {
