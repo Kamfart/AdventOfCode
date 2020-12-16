@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
+// Solution : BFBFFFFLRL
 func main() {
 	start := time.Now()
 
@@ -18,27 +20,22 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	// size := 0
+
+	// part 1 - store high ID seat
 	highSeatID := 0
+
+	var numberSeatUsed = createNullSlice(128)
+	var numberColumnUsed = createNullSlice(8)
+
 	for scanner.Scan() {
 
-		var sizeSeat = make([]int, 128)
-		var columnSeat = make([]int, 8)
-
-		for i := range sizeSeat {
-			sizeSeat[i] = i
-		}
-
-		for i := range columnSeat {
-			columnSeat[i] = i
-		}
+		var sizeSeat = createSlice(128)
+		var columnSeat = createSlice(8)
 
 		// Get next line of puzzle
 		line := scanner.Text()
 		rowInfo := line[0:7]
 		columnInfo := line[7:10]
-
-		// println(rowLine, seatLine)
 
 		var sizeSeatBuff []int
 		var columnSeatBuff []int
@@ -70,8 +67,37 @@ func main() {
 		if currentSeatID > highSeatID {
 			highSeatID = currentSeatID
 		}
+
+		numberSeatUsed[sizeSeatBuff[0]]++
+		numberColumnUsed[columnSeatBuff[0]]++
 	}
 	println(highSeatID)
+	println(numberSeatUsed)
+
+	min := 8
+	index := 0
+	for i := range numberSeatUsed {
+		val := numberSeatUsed[i]
+		if val != 0 && val < min {
+			min = val
+			index = i
+		}
+	}
+
+	println("i : " + strconv.Itoa(index) + " ; value : " + strconv.Itoa(numberSeatUsed[index]))
+
+	min = 1
+	index = 0
+	for i := range numberColumnUsed {
+		val := numberColumnUsed[i]
+		if val != 0 && val < min {
+			min = val
+			index = i
+		}
+	}
+
+	println("i : " + strconv.Itoa(index) + " ; value : " + strconv.Itoa(numberColumnUsed[index]))
+
 	t := time.Now()
 	elapsed := t.Sub(start)
 	fmt.Println(elapsed)
@@ -86,4 +112,37 @@ func sliceArray(array []int, part string) []int {
 	} else {
 		return nil
 	}
+}
+
+func fillSizeSeat(rowInfo, sizeSeat []int) int {
+	var sizeSeatBuff []int
+	for _, car := range rowInfo {
+		s := string(car)
+		if s == "B" {
+			sizeSeatBuff = sliceArray(sizeSeat[:], "B")
+			sizeSeat = sizeSeatBuff
+		} else if s == "F" {
+			sizeSeatBuff = sliceArray(sizeSeat[:], "F")
+			sizeSeat = sizeSeatBuff
+		}
+	}
+	return 0
+}
+
+func createSlice(size int) []int {
+	var slice = make([]int, size)
+	for i := range slice {
+		slice[i] = i
+	}
+
+	return slice
+}
+
+func createNullSlice(size int) []int {
+	var slice = make([]int, size)
+	for i := range slice {
+		slice[i] = 0
+	}
+
+	return slice
 }
