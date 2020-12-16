@@ -57,19 +57,19 @@ func main() {
 	println(highSeatID)
 	println(numberSeatUsed)
 
-	min := 8
-	index := 0
-	for i := range numberSeatUsed {
-		val := numberSeatUsed[i]
-		if val != 0 && val < min {
-			min = val
-			index = i
-		}
-	}
+	// min := 8
+	index := solveGetRowSeat(numberSeatUsed, 8)
+	// for i := range numberSeatUsed {
+	// 	val := numberSeatUsed[i]
+	// 	if val != 0 && val < min {
+	// 		min = val
+	// 		index = i
+	// 	}
+	// }
 
 	println("i : " + strconv.Itoa(index) + " ; value : " + strconv.Itoa(numberSeatUsed[index]))
 
-	min = 1
+	min := 1
 	index = 0
 	for i := range numberColumnUsed {
 		val := numberColumnUsed[i]
@@ -84,6 +84,21 @@ func main() {
 	t := time.Now()
 	elapsed := t.Sub(start)
 	fmt.Println(elapsed)
+}
+
+// Part 2 - Find Row's Seat
+// NOTE : find column should be the same function and be used
+// Maybe change loop to iterate over the 2nd and last -1 possibilities as mentioned in the instruction
+func solveGetRowSeat(numberSeatUsed []int, min int) int {
+	index := 0
+	for i := range numberSeatUsed {
+		val := numberSeatUsed[i]
+		if val != 0 && val < min {
+			min = val
+			index = i
+		}
+	}
+	return index
 }
 
 func maxValue(valA int, valB int) int {
