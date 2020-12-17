@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
-// Solution : BFBFFFFLRL
 func main() {
 	start := time.Now()
 
@@ -54,32 +55,15 @@ func main() {
 		highSeatID = maxValue(currentSeatID, highSeatID)
 	}
 
-	println(highSeatID)
-	println(numberSeatUsed)
+	println("High Seat ID : " + strconv.Itoa(highSeatID))
 
-	// min := 8
 	index := solveGetRowSeat(numberSeatUsed, 8)
-	// for i := range numberSeatUsed {
-	// 	val := numberSeatUsed[i]
-	// 	if val != 0 && val < min {
-	// 		min = val
-	// 		index = i
-	// 	}
-	// }
 
-	println("i : " + strconv.Itoa(index) + " ; value : " + strconv.Itoa(numberSeatUsed[index]))
+	var sizeSeat = createSlice(128)
+	column := solveGetColumnSeat(index, sizeSeat)
 
-	min := 1
-	index = 0
-	for i := range numberColumnUsed {
-		val := numberColumnUsed[i]
-		if val != 0 && val < min {
-			min = val
-			index = i
-		}
-	}
-
-	println("i : " + strconv.Itoa(index) + " ; value : " + strconv.Itoa(numberColumnUsed[index]))
+	solutionPart2 := index*8 + column
+	println("Solution : " + strconv.Itoa(solutionPart2) + " ; row : " + strconv.Itoa(index) + " ; column : " + strconv.Itoa(column))
 
 	t := time.Now()
 	elapsed := t.Sub(start)
@@ -101,8 +85,83 @@ func solveGetRowSeat(numberSeatUsed []int, min int) int {
 	return index
 }
 
+func solveGetColumnSeat(rowID int, sizeSeat []int) int {
+	file, err := os.Open(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	rowString := ""
+
+	// Find row which split the seats up to the value in args
+	for scanner.Scan() {
+		line := scanner.Text()
+		rowInfo := line[0:7]
+		rowSelected := binarySpacePartitioning(rowInfo, sizeSeat)
+		if rowSelected == rowID {
+			rowString = rowInfo
+			break
+		}
+	}
+
+	// Extract all row matching the pattern found in the previous loop
+	ArrayRowsGrep := tinyGrep(rowString, file)
+	column := solveFindLastSeat(ArrayRowsGrep)
+
+	return column
+}
+
+func solveFindLastSeat(rows []string) int {
+	columnUsed := createNullSlice(8)
+	for i := 0; i < len(rows); i++ {
+		columnInfo := rows[i][7:10]
+		// Create a slice which will store all the value already used
+		columnSeat := createSlice(8)
+		columnUsed[binarySpacePartitioning(columnInfo, columnSeat)]++
+	}
+
+	min := 1
+	for i := 0; i < len(columnUsed); i++ {
+		min = minValue(columnUsed[i], min)
+		if min == 0 {
+			return i
+		}
+	}
+
+	return -1
+}
+
+func tinyGrep(pattern string, fileArg io.Reader) []string {
+	var patterns []string
+
+	file, err := os.Open(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, pattern) {
+			patterns = append(patterns, line)
+		}
+	}
+	return patterns
+}
+
 func maxValue(valA int, valB int) int {
 	if valA > valB {
+		return valA
+	}
+	return valB
+}
+
+func minValue(valA int, valB int) int {
+	if valA < valB {
 		return valA
 	}
 	return valB
